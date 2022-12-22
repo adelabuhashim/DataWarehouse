@@ -5,8 +5,8 @@ config = configparser.ConfigParser()
 config.read('dwh.cfg')
 
 # DROP TABLES
-staging_events_table_drop = "DROP TABLE IF EXISTS stagingEvents"
-staging_songs_table_drop = "DROP TABLE IF EXISTS songsEvents"
+staging_events_table_drop = "DROP TABLE IF EXISTS staging_events"
+staging_songs_table_drop = "DROP TABLE IF EXISTS staging_songs"
 songplay_table_drop = "DROP TABLE IF EXISTS songplay"
 user_table_drop = "DROP TABLE IF EXISTS users"
 song_table_drop = "DROP TABLE IF EXISTS song"
@@ -16,9 +16,8 @@ time_table_drop = "DROP TABLE IF EXISTS time"
 # CREATE TABLES
 ## STAGING
 staging_events_table_create= ("""
-CREATE TABLE IF NOT EXISTS stagingEvents
+CREATE TABLE IF NOT EXISTS staging_events
     (
-        event_id      BIGINT identity(0, 1) NOT NULL,
         artist        VARCHAR,
         auth          VARCHAR,
         firstname     VARCHAR,
@@ -42,7 +41,7 @@ CREATE TABLE IF NOT EXISTS stagingEvents
 """)
 
 staging_songs_table_create = ("""
-CREATE TABLE IF NOT EXISTS stagingSongs
+CREATE TABLE IF NOT EXISTS staging_songs
   (
     num_songs        INT,
     artist_id        VARCHAR,
@@ -61,7 +60,7 @@ CREATE TABLE IF NOT EXISTS stagingSongs
 songplay_table_create = ("""
 CREATE TABLE IF not EXISTS songplay
     (
-        songplay_id INTEGER identity(0,1) PRIMARY KEY,
+        songplay_id INTEGER PRIMARY KEY,
         start_time TIMESTAMP sortkey,
         user_id    INTEGER,
         LEVEL      VARCHAR,
@@ -133,7 +132,7 @@ SONG_DATA = config.get('S3', 'SONG_DATA')
 
 
 staging_events_copy = ("""
-    COPY stagingEvents FROM {}
+    COPY staging_events FROM {}
     IAM_ROLE '{}'
     JSON {}
     TIMEFORMAT 'epochmillisecs'  
@@ -142,7 +141,7 @@ staging_events_copy = ("""
 
 
 staging_songs_copy = ("""
-    COPY stagingSongs FROM {}
+    COPY staging_songs FROM {}
     CREDENTIALS 'aws_iam_role={}'
     JSON 'auto'
     REGION 'us-west-2';
@@ -170,9 +169,9 @@ SELECT DISTINCT timestamp 'epoch' + E.ts/1000 * interval '1 second' as start_tim
                 E.session_id,
                 E.location,
                 E.useragent
-FROM            stagingevents E
-join            stagingsongs S
-ON              E.artist = S.artist_name
+FROM            staging_events E
+join            staging_songs S
+ON              E.artist = S.artist_name AND S.title = E.song
 WHERE           E.page = 'NextSong';
 """)
 
@@ -188,7 +187,7 @@ SELECT DISTINCT E.userid,
                 E.lastname,
                 E.gender,
                 E.LEVEL
-FROM   stagingevents E
+FROM   staging_events E
 WHERE  E.page = 'NextSong'; 
 """)
 
@@ -204,7 +203,7 @@ SELECT DISTINCT S.song_id,
                 S.artist_id,
                 S.year,
                 S.duration
-FROM   stagingsongs S; 
+FROM   staging_songs S; 
 """)
 artist_table_insert = ("""
 INSERT INTO artist
@@ -218,7 +217,7 @@ SELECT DISTINCT S.artist_id,
                 S.artist_location,
                 S.artist_latitude,
                 S.artist_longitude
-FROM   stagingsongs S; 
+FROM   staging_songs S; 
 """)
 
 time_table_insert = ("""
@@ -239,7 +238,7 @@ SELECT DISTINCT timestamp 'epoch' + e.ts * interval '1 second' as start_time,
                 extract(month FROM start_time),
                 extract(year FROM start_time),
                 extract(week FROM start_time)
-FROM            stagingevents e
+FROM            staging_events e
 WHERE           e.page = 'NextSong';
 """)
 

@@ -62,3 +62,10 @@ And below is an example of what the data in a log file, 2018-11-12-events.json, 
      - start_time, hour, day, week, month, year, weekday
 
 ![img](/assets/sp_erd.png)
+
+## Project Steps
+1. Create IAM ROLE allowing Programmatic access.
+2. Create clients for EC2, S3, IAM, and Redshift.
+3. Create Cluster on Redshift.
+4. Run ``create_tables.py``
+5. Run ``etl.py`` to insert data ito tables.
