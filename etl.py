@@ -4,12 +4,26 @@ from sql_queries import copy_table_queries, insert_table_queries
 
 
 def load_staging_tables(cur, conn):
+    """
+    A Function that run the queries of the stagging step
+    
+    ARGS:
+        - cur: DB cursor.
+        - con: DB connection.
+    """
     for query in copy_table_queries:
         cur.execute(query)
         conn.commit()
 
 
 def insert_tables(cur, conn):
+    """
+    A Function that run the queries of the tables insertion
+    
+    ARGS:
+        - cur: DB cursor.
+        - con: DB connection.
+    """
     for query in insert_table_queries:
         cur.execute(query)
         conn.commit()
