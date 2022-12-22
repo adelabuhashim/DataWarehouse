@@ -1,5 +1,5 @@
 import configparser
-=
+
 
 # CONFIG
 config = configparser.ConfigParser()
