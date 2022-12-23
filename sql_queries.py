@@ -79,7 +79,7 @@ CREATE TABLE IF not EXISTS users
         first_name VARCHAR                      NULL,
         last_name  VARCHAR                      NULL,
         gender     VARCHAR                      NULL,
-        level      VARCHAR                      NULL,
+        level      VARCHAR                      NULL
     )
     diststyle ALL;
 """)
@@ -110,13 +110,13 @@ CREATE TABLE IF not EXISTS artists
 time_table_create = ("""
 CREATE TABLE IF not EXISTS time
     (
-        start_time TIMESTAMP SORTKET    NOT NULL,
-        hour       INT                  NULL,
-        day        INT                  NULL,
-        week       INT                  NULL,
-        month      INT                  NULL,
-        year       INT                  NULL,
-        weekday    INT                  NULL
+        start_time TIMESTAMP       NOT NULL    SORTKEY,
+        hour       INT             NULL,
+        day        INT             NULL,
+        week       INT             NULL,
+        month      INT             NULL,
+        year       INT             NULL,
+        weekday    INT             NULL
     )
     diststyle ALL;
 """)
